@@ -20,6 +20,9 @@ namespace paletteFromImg {
         private void button1_Click(object sender, EventArgs e) {
 
             if(dlgOpen.ShowDialog()== DialogResult.OK) {
+                colors.Clear();
+                listView1.Items.Clear();
+
                 img = new Bitmap(dlgOpen.FileName);
                 pictureBox1.Image = img;
             } 
@@ -101,6 +104,10 @@ namespace paletteFromImg {
                     Application.DoEvents();
                     Thread.Sleep(0);
                 }
+
+                colors.Clear();
+                listView1.Items.Clear();
+
                 pictureBox1.Image = img;
             }
         }
