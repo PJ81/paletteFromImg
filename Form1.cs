@@ -57,6 +57,8 @@ namespace paletteFromImg {
         }
 
         private void button2_Click(object sender, EventArgs e) {
+            if (img == null) return;
+
             colors.Clear();
             listView1.Items.Clear();
 
@@ -83,6 +85,8 @@ namespace paletteFromImg {
         }
 
         private void button3_Click(object sender, EventArgs e) {
+            if (listView1.Items.Count < 1) return;
+
             string txt = "[";
             foreach(ListViewItem li in listView1.Items) {
                 txt += "\"" + li.Text.Trim() + "\", "; 
