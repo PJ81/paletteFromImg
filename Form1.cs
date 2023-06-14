@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace paletteFromImg {
     public partial class Form1 : Form {
 
         private List<Color> colors = new List<Color>();
-        Bitmap img;
+        private Bitmap img;
+        private bool validFile;
+        private Thread getImageThread;
 
         public Form1() {
             InitializeComponent();
@@ -85,6 +89,49 @@ namespace paletteFromImg {
             }
 
             Clipboard.SetText(txt.Substring(0, txt.Length - 2) + "]");
+        }
+
+        private void Form1_DragDrop(object sender, DragEventArgs e) {
+            if (validFile) {
+                while (getImageThread.IsAlive) {
+                    Application.DoEvents();
+                    Thread.Sleep(0);
+                }
+                pictureBox1.Image = img;
+            }
+        }
+
+        private void Form1_DragEnter(object sender, DragEventArgs e) {
+            string filename = getFilename(e);
+            validFile = !filename.Equals("");
+
+            if (validFile) {
+                getImageThread = new Thread(new ThreadStart(() =>
+                {
+                    img = new Bitmap(filename);
+                }));
+                getImageThread.Start();
+                e.Effect = DragDropEffects.Copy;
+            }
+            else
+                e.Effect = DragDropEffects.None;
+        }
+
+        private string getFilename(DragEventArgs e) {
+
+            if ((e.AllowedEffect & DragDropEffects.Copy) == DragDropEffects.Copy) {
+                Array data = e.Data.GetData("FileDrop") as Array;
+                if (data != null) {
+                    if ((data.Length == 1) && (data.GetValue(0) is String)) {
+                        string filename = ((string[])data)[0];
+                        string ext = Path.GetExtension(filename).ToLower();
+                        if ((ext == ".jpg") || (ext == ".jpeg") || (ext == ".png") || (ext == ".bmp")) {
+                            return filename;
+                        }
+                    }
+                }
+            }
+            return "";
         }
     }
 }
